@@ -77,5 +77,7 @@ Ensure you have installed Speccy globally and then you can use the following com
 speccy serve storage/app/v1_openapi.yaml
 ```
 
+## Preview documentation
 
- test
+[PHPStorm plugin OpenAPI Specifications](https://plugins.jetbrains.com/plugin/14394-openapi-specifications)  
+
