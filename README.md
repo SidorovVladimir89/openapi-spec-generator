@@ -62,6 +62,22 @@ Publish the config file
 php artisan vendor:publish --provider="LaravelJsonApi\OpenApiSpec\OpenApiServiceProvider"
 ```
 
+Add docs file disk  
+
+```
+    'disks' => [
+
+        'local' => [
+            'driver' => 'local',
+            'root' => storage_path('app'),
+        ],
+
+        'docs' => [
+            'driver' => 'local',
+            'root' => app_path('/../docs'),
+        ],
+```
+
 Generate the Open API spec
 ```
 php artisan jsonapi:openapi:generate v1

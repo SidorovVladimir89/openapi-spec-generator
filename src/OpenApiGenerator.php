@@ -26,7 +26,7 @@ class OpenApiGenerator
           } elseif ($format === 'json') {
             $output = json_encode($openapi->toArray(), JSON_PRETTY_PRINT);
             /** TODO: добавить возможность настраивать драйвер и место сохранения */
-            \Illuminate\Support\Facades\Storage::disk('local')->put($serverKey . '_openapi.json', $output);
+            \Illuminate\Support\Facades\Storage::disk('docs')->put($serverKey . '_openapi.json', $output);
           }
 
           return $output;
