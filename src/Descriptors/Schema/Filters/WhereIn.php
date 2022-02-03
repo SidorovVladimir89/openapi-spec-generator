@@ -7,6 +7,7 @@ namespace LaravelJsonApi\OpenApiSpec\Descriptors\Schema\Filters;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\Example;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\Parameter;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\Schema;
+use LaravelJsonApi\Core\Support\Str;
 use LaravelJsonApi\Eloquent\Filters\WhereNotIn;
 
 
@@ -20,7 +21,7 @@ class WhereIn extends FilterDescriptor
         $key = $this->filter->key();
         $examples = collect($this->generator->resources()
           ->resources($this->route->schema()::model()))
-          ->pluck($key)
+          ->pluck(Str::underscore($key))
           ->map(function ($f) {
               // @todo Watch out for ids?
               return Example::create($f)->value($f);

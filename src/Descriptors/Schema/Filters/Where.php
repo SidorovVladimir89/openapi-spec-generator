@@ -6,6 +6,7 @@ namespace LaravelJsonApi\OpenApiSpec\Descriptors\Schema\Filters;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\Example;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\Parameter;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\Schema as OASchema;
+use LaravelJsonApi\Core\Support\Str;
 
 
 class Where extends FilterDescriptor
@@ -20,8 +21,8 @@ class Where extends FilterDescriptor
         $key = $this->filter->key();
         $examples = collect($this->generator->resources()
           ->resources($this->route->schema()::model()))
-          ->pluck($key)
-          ->map(function ($f) {
+          ->pluck(Str::underscore($key))
+          ->map(function ($f, $k) {
               // @todo Watch out for ids?
                  return Example::create($f)->value($f);
           })
