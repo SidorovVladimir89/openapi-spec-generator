@@ -24,7 +24,14 @@ class Where extends FilterDescriptor
           ->pluck(Str::underscore($key))
           ->map(function ($f, $k) {
               // @todo Watch out for ids?
-                 return Example::create($f)->value($f);
+              
+              if ($f === null) {
+                  /** TODO: Attribute by filter not found (custom filter nameILike)  */
+                  
+                  return Example::create('todo ' . $k)->value('todo ' . $k);
+              }
+              
+              return Example::create($f)->value($f);
           })
           ->toArray();
 
