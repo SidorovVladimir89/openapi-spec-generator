@@ -7,6 +7,7 @@ namespace LaravelJsonApi\OpenApiSpec\Descriptors\Schema;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\Parameter;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use LaravelJsonApi\Contracts\Schema\Field;
 use LaravelJsonApi\Contracts\Schema\PolymorphicRelation;
 use LaravelJsonApi\Contracts\Schema\Schema as JASchema;
@@ -64,7 +65,6 @@ class Schema extends Descriptor implements SchemaDescriptor, SortablesDescriptor
         $resource = $this->generator
           ->resources()
           ->resource($schema::model());
-
         $fields = $this->fields($schema->fields(), $resource);
         $properties = [
           OASchema::string('type')
@@ -75,7 +75,7 @@ class Schema extends Descriptor implements SchemaDescriptor, SortablesDescriptor
           OASchema::object('attributes')
             ->properties(...($fields->get('attributes') ?? [])),
         ];
-
+        
         if ($fields->has('relationships')) {
             $properties[] = OASchema::object('relationships')
               ->properties(...$fields->get('relationships'));
@@ -426,9 +426,24 @@ class Schema extends Descriptor implements SchemaDescriptor, SortablesDescriptor
 
               $schema = $fieldDataType->title($field->name());
 
-              if (isset($example[$field->name()])) {
-                  $schema = $schema->example($example[$field->name()]);
+              try {
+                  /**
+                   * TODO: execute $example[$field->name()] with
+                   * for field type ArrayList with extractUsing
+                   *     ArrayList::make('itemsData')->extractUsing(
+                   *         static fn($model, $column, $value) => Arr::camelize($model->itemsData())
+                   *     ),
+                   * message: "App\Models\Category::itemsData must return a relationship instance."
+                   * /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:540
+                   */
+                  if (isset($example[$field->name()])) {
+                      $schema = $schema->example($example[$field->name()]);
+                  }
+              } catch (\Throwable $exception) {
+                  Log::warning(new \Exception('Example not set.', 0, $exception));
+                  $schema = $schema->example('todo: example not set');
               }
+
               if ($field->isReadOnly(null)) {
                   $schema = $schema->readOnly(true);
               }
