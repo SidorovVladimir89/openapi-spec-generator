@@ -353,8 +353,9 @@ class Schema extends Descriptor implements SchemaDescriptor, SortablesDescriptor
           ->map(function (Eloquent\Contracts\Filter $filterInstance) use ($route
           ) {
             $descriptor = $this->getDescriptor($filterInstance);
-            return (new $descriptor($this->generator, $route, $filterInstance))->filter();
+            return empty($descriptor) ? null : (new $descriptor($this->generator, $route, $filterInstance))->filter();
           })
+          ->filter()
           ->flatten()
           ->toArray();
     }
@@ -622,6 +623,8 @@ class Schema extends Descriptor implements SchemaDescriptor, SortablesDescriptor
                 return $descriptor;
             }
         }
+        
+        return '';
     }
 
 }

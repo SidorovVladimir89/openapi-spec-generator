@@ -31,6 +31,18 @@ class ResourceContainer
         if(!isset($this->resource[$fqn])){
             $this->loadResources($fqn);
         }
+
+        if (!array_key_exists($fqn, $this->resources)) {
+            if (!method_exists($fqn, 'getExample')) {
+                throw new \LogicException('Not found getExample() method in ' . $fqn);
+            }
+            
+            $example = $fqn::getExample();
+            $resourse = $this->server->resources()->create($example);
+            
+            return $resourse;
+        }
+        
         return $this->resources[$fqn]->first();
     }
 
