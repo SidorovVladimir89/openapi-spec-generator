@@ -17,7 +17,8 @@ class OpenApiGenerator
           $generator = new Generator($serverKey);
           $openapi = $generator->generate();
 
-          $openapi->validate();
+          // TODO: расскоментить
+          // $openapi->validate();
 
           if ($format === 'yaml') {
             $output = Yaml::dump($openapi->toArray());
@@ -28,6 +29,8 @@ class OpenApiGenerator
             /** TODO: добавить возможность настраивать драйвер и место сохранения */
             \Illuminate\Support\Facades\Storage::disk('docs')->put($serverKey . '_openapi.json', $output);
           }
+
+          $openapi->validate();
 
           return $output;
         }
