@@ -19,9 +19,18 @@ class WhereIn extends FilterDescriptor
      */
     public function filter(): array {
         $key = $this->filter->key();
+
+        /**
+         * @see WhereIn::guessColumn() 
+         * "myMetals" to "my_metal"
+         */
+        $column = Str::underscore(
+            Str::singular($key)
+        );
+
         $examples = collect($this->generator->resources()
           ->resources($this->route->schema()::model()))
-          ->pluck(Str::underscore($key))
+          ->pluck($column)
           ->map(function ($f) {
               // @todo Watch out for ids?
               if ($f === null) {
