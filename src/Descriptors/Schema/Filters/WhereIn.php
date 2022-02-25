@@ -24,6 +24,10 @@ class WhereIn extends FilterDescriptor
           ->pluck(Str::underscore($key))
           ->map(function ($f) {
               // @todo Watch out for ids?
+              if ($f === null) {
+                  $f = 'todoValueIsNull';
+              }
+              
               return Example::create($f)->value($f);
           })
           ->toArray();
