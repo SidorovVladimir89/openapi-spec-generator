@@ -4,10 +4,13 @@
 namespace LaravelJsonApi\OpenApiSpec;
 
 
+use GoldSpecDigital\ObjectOrientedOAS\Objects\SecurityRequirement;
+use GoldSpecDigital\ObjectOrientedOAS\Objects\SecurityScheme;
 use GoldSpecDigital\ObjectOrientedOAS\OpenApi;
 use LaravelJsonApi\Contracts\Server\Server;
 use LaravelJsonApi\OpenApiSpec\Builders\InfoBuilder;
 use LaravelJsonApi\OpenApiSpec\Builders\PathsBuilder;
+use LaravelJsonApi\OpenApiSpec\Builders\SecurityBuilder;
 use LaravelJsonApi\OpenApiSpec\Builders\ServerBuilder;
 
 class Generator
@@ -18,6 +21,8 @@ class Generator
     protected Server $server;
 
     protected InfoBuilder $infoBuilder;
+
+    protected SecurityBuilder $securityBuilder;
 
     protected ServerBuilder $serverBuilder;
 
@@ -43,6 +48,7 @@ class Generator
         $this->server = new $apiServer($app, $this->key);
 
         $this->infoBuilder = new InfoBuilder($this);
+        $this->securityBuilder = new SecurityBuilder($this);
         $this->serverBuilder = new ServerBuilder($this);
         $this->components = new ComponentsContainer();
         $this->resources = new ResourceContainer($this->server);
@@ -57,9 +63,11 @@ class Generator
         return OpenApi::create()
           ->openapi(OpenApi::OPENAPI_3_0_2)
           ->info($this->infoBuilder->build())
+          ->security(...$this->securityBuilder->build())
           ->servers(...$this->serverBuilder->build())
           ->paths(...array_values($this->pathsBuilder->build()))
-          ->components($this->components()->components());
+          ->components($this->components()->components()
+              ->securitySchemes(...$this->securityBuilder->getSecuritySchemes()));
     }
 
     /**
