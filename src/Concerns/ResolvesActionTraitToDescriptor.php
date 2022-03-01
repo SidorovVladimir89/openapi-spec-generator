@@ -16,6 +16,7 @@ trait ResolvesActionTraitToDescriptor
     protected function descriptorClass(SpecRoute $route): ?string
     {
         [$class, $method] = $route->controllerCallable();
+        
         try {
             $reflection = new \ReflectionClass($class);
             $methodReflection = $reflection->getMethod($method);

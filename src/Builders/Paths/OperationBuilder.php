@@ -77,6 +77,27 @@ class OperationBuilder extends Builder
      */
     protected function getDescriptor(Route $route): ?Descriptors\Actions\ActionDescriptor{
         $class = $this->descriptorClass($route);
+        
+        if ($class === null) {
+            switch ($route->action()) {
+                case 'index':
+                    $class = 'LaravelJsonApi\Laravel\Http\Controllers\Actions\FetchMany';
+                    break;
+                case 'show':
+                    $class = 'LaravelJsonApi\Laravel\Http\Controllers\Actions\FetchOne';
+                    break;
+                case 'store':
+                    $class = 'LaravelJsonApi\Laravel\Http\Controllers\Actions\Store';
+                    break;
+                case 'update':
+                    $class = 'LaravelJsonApi\Laravel\Http\Controllers\Actions\Update';
+                    break;
+                case 'destroy':
+                    $class = 'LaravelJsonApi\Laravel\Http\Controllers\Actions\Destroy';
+                    break;
+            }
+        }
+        
         if(isset($this->descriptors[$class])){
             return new $this->descriptors[$class](
               $this->parameterBuilder,
@@ -86,6 +107,7 @@ class OperationBuilder extends Builder
               $route
             );
         }
+        
         return null;
     }
 

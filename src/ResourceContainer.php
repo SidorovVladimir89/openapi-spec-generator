@@ -32,17 +32,6 @@ class ResourceContainer
             $this->loadResources($fqn);
         }
 
-        if (!array_key_exists($fqn, $this->resources)) {
-            if (!method_exists($fqn, 'getExample')) {
-                throw new \LogicException('Not found getExample() method in ' . $fqn);
-            }
-            
-            $example = $fqn::getExample();
-            $resourse = $this->server->resources()->create($example);
-            
-            return $resourse;
-        }
-        
         return $this->resources[$fqn]->first();
     }
 
@@ -53,9 +42,11 @@ class ResourceContainer
      */
     public function resources($model): array{
         $fqn = $this->getFQN($model);
+        
         if(!isset($this->resource[$fqn])){
             $this->loadResources($fqn);
         }
+        
         return $this->resources[$fqn]->toArray();
     }
 
@@ -80,6 +71,17 @@ class ResourceContainer
             })->take(3);
 
             $this->resources[$model] = $resources;
+        }
+        
+        if (empty($this->resources[$model])) {
+            if (!method_exists($model, 'getExample')) {
+                throw new \LogicException('Not found getExample() method in ' . $fqn);
+            }
+
+            $example = $model::getExample();
+            $resourse = $this->server->resources()->create($example);
+
+            $this->resources[$model] = collect()->add($resourse);
         }
     }
 }

@@ -34,6 +34,7 @@ class PathsBuilder extends Builder
      */
     public function build(): array
     {
+        
         return collect(Route::getRoutes()->getRoutes())
           ->filter(
             fn(IlluminateRoute $route) => SpecRoute::belongsTo($route,
@@ -45,7 +46,6 @@ class PathsBuilder extends Builder
               return [$route->uri() => $route];
           })
           ->map(function (Collection $routes, string $uri) {
-
               $operations = $routes
                 ->map(function (SpecRoute $route) {
                     return $this->operation->build($route);
