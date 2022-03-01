@@ -8,8 +8,10 @@ use GoldSpecDigital\ObjectOrientedOAS\Objects\Parameter;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
+use LaravelJsonApi\Contracts\Schema\Attribute as AttributeContract;
 use LaravelJsonApi\Contracts\Schema\Field;
 use LaravelJsonApi\Contracts\Schema\PolymorphicRelation;
+use LaravelJsonApi\Contracts\Schema\Relation as RelationContract;
 use LaravelJsonApi\Contracts\Schema\Schema as JASchema;
 use LaravelJsonApi\Contracts\Schema\Sortable;
 use LaravelJsonApi\Core\Resources\JsonApiResource;
@@ -373,10 +375,10 @@ class Schema extends Descriptor implements SchemaDescriptor, SortablesDescriptor
         return collect($fields)
           ->mapToGroups(function (Field $field) {
               switch (true) {
-                case $field instanceof Attribute:
+                case $field instanceof AttributeContract:
                   $key = 'attributes';
                   break;
-                case $field instanceof Relation:
+                case $field instanceof RelationContract:
                   $key = 'relationships';
                   break;
                 default:
@@ -445,9 +447,13 @@ class Schema extends Descriptor implements SchemaDescriptor, SortablesDescriptor
                   $schema = $schema->example('todo: example not set');
               }
 
-              if ($field->isReadOnly(null)) {
+              if (
+                  $field instanceof ReadOnly
+                  && $field->isReadOnly(null)
+              ) {
                   $schema = $schema->readOnly(true);
               }
+
               return $schema;
           })->toArray();
     }
@@ -464,7 +470,7 @@ class Schema extends Descriptor implements SchemaDescriptor, SortablesDescriptor
       JsonApiResource $example
     ): array {
         return $relationships
-          ->map(function (Relation $relation) use ($example) {
+          ->map(function (RelationContract $relation) use ($example) {
               return $this->relationship($relation, $example);
           })->toArray();
 
@@ -479,7 +485,7 @@ class Schema extends Descriptor implements SchemaDescriptor, SortablesDescriptor
      * @throws \GoldSpecDigital\ObjectOrientedOAS\Exceptions\InvalidArgumentException
      */
     protected function relationship(
-      Relation $relation,
+      RelationContract $relation,
       JsonApiResource $example,
       bool $includeData = false
     ): OASchema {
@@ -514,7 +520,7 @@ class Schema extends Descriptor implements SchemaDescriptor, SortablesDescriptor
      * @throws \GoldSpecDigital\ObjectOrientedOAS\Exceptions\InvalidArgumentException
      */
     protected function relationshipData(
-      Relation $relation,
+      RelationContract $relation,
       JsonApiResource $example,
       string $type
     ): OASchema {
@@ -557,12 +563,12 @@ class Schema extends Descriptor implements SchemaDescriptor, SortablesDescriptor
      * @return \GoldSpecDigital\ObjectOrientedOAS\Objects\Schema
      */
     public function relationshipLinks(
-      $relation,
+      RelationContract $relation,
       JsonApiResource $example,
       string $type
     ): OASchema {
         $name = Str::dasherize(
-          Str::plural($relation->relationName())
+          Str::plural($relation->name())
         );
 
         /*
