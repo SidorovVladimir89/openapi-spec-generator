@@ -495,7 +495,7 @@ class Schema extends Descriptor implements SchemaDescriptor, SortablesDescriptor
     ): array {
         return $relationships
           ->map(function (RelationContract $relation) use ($example) {
-              return $this->relationship($relation, $example);
+              return $this->relationship($relation, $example, true);
           })->toArray();
 
     }
