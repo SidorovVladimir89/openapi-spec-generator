@@ -294,6 +294,30 @@ class Schema extends Descriptor implements SchemaDescriptor, SortablesDescriptor
     }
 
     /**
+     * @param \LaravelJsonApi\OpenApiSpec\Route $route
+     * @return \GoldSpecDigital\ObjectOrientedOAS\Objects\Parameter[]
+     */
+    public function includes($route): array
+    {
+        $fields = collect($route->schema()->relationships())->keys();
+        
+        /** 
+         * TODO: apply Schema::maxDepth
+         * @see Schema::$maxDepth
+         */
+
+        return [
+          Parameter::query('include')
+            ->name('include')
+            ->schema(OASchema::array()
+              ->items(OASchema::string()->enum(...$fields))
+            )
+            ->allowEmptyValue(false)
+            ->required(false),
+        ];
+    }
+
+    /**
      * @param  \LaravelJsonApi\OpenApiSpec\Route  $route
      *
      * @return array

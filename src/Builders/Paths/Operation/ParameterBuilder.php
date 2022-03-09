@@ -57,6 +57,15 @@ class ParameterBuilder extends Builder
               ->schema(OASchema::string());
         }
 
+        if (in_array($route->action(), [
+            'index',
+            'show',
+            'store',
+            'update',
+        ])) {
+            $parameters = collect($parameters)->merge($schemaDescriptor->includes($route))->all();
+        }
+        
         return $parameters;
     }
 
